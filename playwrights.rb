@@ -10,6 +10,16 @@ class Playwright
     data.map { |datum| Playwright.new(datum) }
   end
 
+  def self.find_by_name(name)
+    data = PlayDBConnection.instance.execute("SELECT * FROM playwrights")
+    data.each do |datum|
+      if datum["name"] == name
+        return Playwright.new(datum)
+      end
+    end
+    raise "#{name} not in database"
+  end
+
   def initialize(options)
     @id = options['id']
     @name = options['name']
