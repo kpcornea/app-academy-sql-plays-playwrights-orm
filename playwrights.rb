@@ -49,4 +49,17 @@ class Playwright
     SQL
   end
 
+  def get_plays
+    data = PlayDBConnection.instance.execute("SELECT * FROM plays")
+    plays_by_playwright = []
+
+    data.each do |datum|
+      if datum["playwright_id"] == @id
+        plays_by_playwright << Play.new(datum)
+      end
+    end
+    return plays_by_playwright unless plays_by_playwright.empty?
+    raise "#{name} doesn't have plays in the database"
+  end
+
 end
