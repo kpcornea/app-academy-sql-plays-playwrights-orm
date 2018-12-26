@@ -16,7 +16,7 @@ class Play
 
   def self.all
     data = PlayDBConnection.instance.execute("SELECT * FROM plays")
-    # p data
+    p data
     data.map { |datum| Play.new(datum) }
   end
 
@@ -28,6 +28,29 @@ class Play
       end
     end
     raise "#{title} not in database"
+  end
+
+  def self.find_by_playwright(name)
+    data = PlayDBConnection.instance.execute("SELECT * FROM plays")
+    playwright_arr = PlayDBConnection.instance.execute(<<-SQL, name)
+      SELECT
+        id
+      FROM
+        playwrights
+      WHERE
+        name = ?
+    SQL
+
+    playwright_id = playwright_arr[0]["id"] unless playwright_arr.empty?
+    plays_by_playwright = []
+
+    data.each do |datum|
+      if datum["playwright_id"] == playwright_id
+        plays_by_playwright << Play.new(datum)
+      end
+    end
+    return plays_by_playwright unless plays_by_playwright.empty?
+    raise "#{name} doesn't have plays in the database"
   end
 
   def initialize(options)
