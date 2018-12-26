@@ -16,7 +16,18 @@ class Play
 
   def self.all
     data = PlayDBConnection.instance.execute("SELECT * FROM plays")
+    # p data
     data.map { |datum| Play.new(datum) }
+  end
+
+  def self.find_by_title(title)
+    data = PlayDBConnection.instance.execute("SELECT * FROM plays")
+    data.each do |datum|
+      if datum["title"] == title
+        return Play.new(datum)
+      end
+    end
+    raise "#{title} not in database"
   end
 
   def initialize(options)
